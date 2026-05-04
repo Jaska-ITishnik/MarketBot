@@ -1,0 +1,11 @@
+[
+   {
+      "id": 1,
+      "name": "Pepsi",
+      "photo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhEEDDi983uTfDNTuaUPVC9ah3IBIycUz-Bg&s",
+      "category_id": 2,
+      "price": 12000,
+      "amount": 500,
+      "is_discount": false
+   }
+]
