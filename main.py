@@ -14,7 +14,6 @@ from aiogram.types import Message, BotCommand
 from dotenv import load_dotenv
 
 from bot.buttons import main_menu_user_kb, main_menu_admin_kb
-from bot.handlers import admin_message_router
 
 load_dotenv(".env")
 TOKEN = os.getenv("BOT_TOKEN")
@@ -59,7 +58,6 @@ async def on_shutdown(bot: Bot):
 
 async def main() -> None:
     bot = Bot(token=TOKEN)  # noqa
-    dp.include_routers(admin_message_router)
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
     await dp.start_polling(bot)

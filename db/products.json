@@ -1,11 +1,596 @@
 [
-   {
-      "id": 1,
-      "name": "Pepsi",
-      "photo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhEEDDi983uTfDNTuaUPVC9ah3IBIycUz-Bg&s",
-      "category_id": 2,
-      "price": 12000,
-      "amount": 500,
-      "is_discount": false
-   }
+  {
+    "id": 1,
+    "name": "Pepsi 0.5L",
+    "photo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhEEDDi983uTfDNTuaUPVC9ah3IBIycUz-Bg&s",
+    "category_id": 2,
+    "price": 12000,
+    "amount": 500,
+    "is_discount": false
+  },
+  {
+    "id": 2,
+    "name": "Coca-Cola 1L",
+    "photo": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97",
+    "category_id": 2,
+    "price": 16000,
+    "amount": 300,
+    "is_discount": false
+  },
+  {
+    "id": 3,
+    "name": "Fanta 1L",
+    "photo": "https://images.unsplash.com/photo-1624517452488-04869289c4ca",
+    "category_id": 2,
+    "price": 15000,
+    "amount": 250,
+    "is_discount": false
+  },
+  {
+    "id": 4,
+    "name": "Sprite 1L",
+    "photo": "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3",
+    "category_id": 2,
+    "price": 15000,
+    "amount": 220,
+    "is_discount": false
+  },
+  {
+    "id": 5,
+    "name": "Nestle suv 1.5L",
+    "photo": "https://images.unsplash.com/photo-1523362628745-0c100150b504",
+    "category_id": 2,
+    "price": 8000,
+    "amount": 600,
+    "is_discount": false
+  },
+  {
+    "id": 6,
+    "name": "Gazlangan suv 1L",
+    "photo": "https://images.unsplash.com/photo-1551024709-8f23befc6f87",
+    "category_id": 2,
+    "price": 7000,
+    "amount": 400,
+    "is_discount": true
+  },
+  {
+    "id": 7,
+    "name": "Mol go'shti 1kg",
+    "photo": "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f",
+    "category_id": 1,
+    "price": 95000,
+    "amount": 80,
+    "is_discount": false
+  },
+  {
+    "id": 8,
+    "name": "Qo'y go'shti 1kg",
+    "photo": "https://images.unsplash.com/photo-1602470520998-f4a52199a3d6",
+    "category_id": 1,
+    "price": 105000,
+    "amount": 60,
+    "is_discount": false
+  },
+  {
+    "id": 9,
+    "name": "Tovuq go'shti 1kg",
+    "photo": "https://images.unsplash.com/photo-1587593810167-a84920ea0781",
+    "category_id": 1,
+    "price": 42000,
+    "amount": 150,
+    "is_discount": true
+  },
+  {
+    "id": 10,
+    "name": "Tovuq filesi 1kg",
+    "photo": "https://images.unsplash.com/photo-1604503468506-a8da13d82791",
+    "category_id": 1,
+    "price": 58000,
+    "amount": 120,
+    "is_discount": false
+  },
+  {
+    "id": 11,
+    "name": "Kolbasa 500g",
+    "photo": "https://images.unsplash.com/photo-1585325701161-351af916e581",
+    "category_id": 1,
+    "price": 36000,
+    "amount": 90,
+    "is_discount": false
+  },
+  {
+    "id": 12,
+    "name": "Sosiska 500g",
+    "photo": "https://images.unsplash.com/photo-1599919158642-c0f1c02e3000",
+    "category_id": 1,
+    "price": 32000,
+    "amount": 100,
+    "is_discount": true
+  },
+  {
+    "id": 13,
+    "name": "Sut 1L",
+    "photo": "https://images.unsplash.com/photo-1563636619-e9143da7973b",
+    "category_id": 3,
+    "price": 12000,
+    "amount": 200,
+    "is_discount": false
+  },
+  {
+    "id": 14,
+    "name": "Qatiq 1L",
+    "photo": "https://images.unsplash.com/photo-1628088062854-d1870b4553da",
+    "category_id": 3,
+    "price": 14000,
+    "amount": 150,
+    "is_discount": false
+  },
+  {
+    "id": 15,
+    "name": "Kefir 1L",
+    "photo": "https://images.unsplash.com/photo-1550583724-b2692b85b150",
+    "category_id": 3,
+    "price": 13000,
+    "amount": 130,
+    "is_discount": false
+  },
+  {
+    "id": 16,
+    "name": "Smetana 400g",
+    "photo": "https://images.unsplash.com/photo-1488477181946-6428a0291777",
+    "category_id": 3,
+    "price": 18000,
+    "amount": 100,
+    "is_discount": false
+  },
+  {
+    "id": 17,
+    "name": "Pishloq 500g",
+    "photo": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d",
+    "category_id": 3,
+    "price": 48000,
+    "amount": 80,
+    "is_discount": true
+  },
+  {
+    "id": 18,
+    "name": "Tuxum 10 dona",
+    "photo": "https://images.unsplash.com/photo-1506976785307-8732e854ad03",
+    "category_id": 3,
+    "price": 18000,
+    "amount": 200,
+    "is_discount": false
+  },
+  {
+    "id": 19,
+    "name": "Oq non",
+    "photo": "https://images.unsplash.com/photo-1509440159596-0249088772ff",
+    "category_id": 4,
+    "price": 4000,
+    "amount": 300,
+    "is_discount": false
+  },
+  {
+    "id": 20,
+    "name": "Qora non",
+    "photo": "https://images.unsplash.com/photo-1549931319-a545dcf3bc73",
+    "category_id": 4,
+    "price": 5000,
+    "amount": 220,
+    "is_discount": false
+  },
+  {
+    "id": 21,
+    "name": "Baton non",
+    "photo": "https://images.unsplash.com/photo-1608198093002-ad4e005484ec",
+    "category_id": 4,
+    "price": 7000,
+    "amount": 160,
+    "is_discount": false
+  },
+  {
+    "id": 22,
+    "name": "Bulochka",
+    "photo": "https://images.unsplash.com/photo-1517433367423-c7e5b0f35086",
+    "category_id": 4,
+    "price": 6000,
+    "amount": 120,
+    "is_discount": false
+  },
+  {
+    "id": 23,
+    "name": "Lavash noni",
+    "photo": "https://images.unsplash.com/photo-1601050690597-df0568f70950",
+    "category_id": 4,
+    "price": 9000,
+    "amount": 100,
+    "is_discount": true
+  },
+  {
+    "id": 24,
+    "name": "Olma 1kg",
+    "photo": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6",
+    "category_id": 5,
+    "price": 18000,
+    "amount": 200,
+    "is_discount": false
+  },
+  {
+    "id": 25,
+    "name": "Banan 1kg",
+    "photo": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e",
+    "category_id": 5,
+    "price": 25000,
+    "amount": 180,
+    "is_discount": false
+  },
+  {
+    "id": 26,
+    "name": "Apelsin 1kg",
+    "photo": "https://images.unsplash.com/photo-1580052614034-c55d20bfee3b",
+    "category_id": 5,
+    "price": 22000,
+    "amount": 150,
+    "is_discount": true
+  },
+  {
+    "id": 27,
+    "name": "Kartoshka 1kg",
+    "photo": "https://images.unsplash.com/photo-1518977676601-b53f82aba655",
+    "category_id": 5,
+    "price": 8000,
+    "amount": 500,
+    "is_discount": false
+  },
+  {
+    "id": 28,
+    "name": "Piyoz 1kg",
+    "photo": "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb",
+    "category_id": 5,
+    "price": 6000,
+    "amount": 400,
+    "is_discount": false
+  },
+  {
+    "id": 29,
+    "name": "Sabzi 1kg",
+    "photo": "https://images.unsplash.com/photo-1445282768818-728615cc910a",
+    "category_id": 5,
+    "price": 7000,
+    "amount": 350,
+    "is_discount": false
+  },
+  {
+    "id": 30,
+    "name": "Pomidor 1kg",
+    "photo": "https://images.unsplash.com/photo-1592924357228-91a4daadcfea",
+    "category_id": 5,
+    "price": 18000,
+    "amount": 200,
+    "is_discount": false
+  },
+  {
+    "id": 31,
+    "name": "Bodring 1kg",
+    "photo": "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6",
+    "category_id": 5,
+    "price": 15000,
+    "amount": 180,
+    "is_discount": true
+  },
+  {
+    "id": 32,
+    "name": "Shokolad",
+    "photo": "https://images.unsplash.com/photo-1606312619070-d48b4c652a52",
+    "category_id": 6,
+    "price": 15000,
+    "amount": 150,
+    "is_discount": false
+  },
+  {
+    "id": 33,
+    "name": "Pechenye",
+    "photo": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e",
+    "category_id": 6,
+    "price": 18000,
+    "amount": 120,
+    "is_discount": false
+  },
+  {
+    "id": 34,
+    "name": "Vafli",
+    "photo": "https://images.unsplash.com/photo-1528207776546-365bb710ee93",
+    "category_id": 6,
+    "price": 12000,
+    "amount": 130,
+    "is_discount": true
+  },
+  {
+    "id": 35,
+    "name": "Konfet 1kg",
+    "photo": "https://images.unsplash.com/photo-1582058091505-f87a2e55a40f",
+    "category_id": 6,
+    "price": 45000,
+    "amount": 90,
+    "is_discount": false
+  },
+  {
+    "id": 36,
+    "name": "Tort",
+    "photo": "https://images.unsplash.com/photo-1578985545062-69928b1d9587",
+    "category_id": 6,
+    "price": 85000,
+    "amount": 30,
+    "is_discount": false
+  },
+  {
+    "id": 37,
+    "name": "Guruch 1kg",
+    "photo": "https://images.unsplash.com/photo-1586201375761-83865001e31c",
+    "category_id": 7,
+    "price": 18000,
+    "amount": 250,
+    "is_discount": false
+  },
+  {
+    "id": 38,
+    "name": "Makaron 500g",
+    "photo": "https://images.unsplash.com/photo-1551462147-ff29053bfc14",
+    "category_id": 7,
+    "price": 9000,
+    "amount": 300,
+    "is_discount": false
+  },
+  {
+    "id": 39,
+    "name": "Grechka 1kg",
+    "photo": "https://images.unsplash.com/photo-1604908554027-242c28404e73",
+    "category_id": 7,
+    "price": 22000,
+    "amount": 180,
+    "is_discount": false
+  },
+  {
+    "id": 40,
+    "name": "Mosh 1kg",
+    "photo": "https://images.unsplash.com/photo-1615485925600-97237c4fc1ec",
+    "category_id": 7,
+    "price": 24000,
+    "amount": 140,
+    "is_discount": true
+  },
+  {
+    "id": 41,
+    "name": "Un 1kg",
+    "photo": "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b",
+    "category_id": 7,
+    "price": 7000,
+    "amount": 400,
+    "is_discount": false
+  },
+  {
+    "id": 42,
+    "name": "Qora choy",
+    "photo": "https://images.unsplash.com/photo-1544787219-7f47ccb76574",
+    "category_id": 8,
+    "price": 18000,
+    "amount": 200,
+    "is_discount": false
+  },
+  {
+    "id": 43,
+    "name": "Ko'k choy",
+    "photo": "https://images.unsplash.com/photo-1556679343-c7306c1976bc",
+    "category_id": 8,
+    "price": 17000,
+    "amount": 180,
+    "is_discount": false
+  },
+  {
+    "id": 44,
+    "name": "Nescafe qahva",
+    "photo": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085",
+    "category_id": 8,
+    "price": 35000,
+    "amount": 90,
+    "is_discount": true
+  },
+  {
+    "id": 45,
+    "name": "3v1 kofe",
+    "photo": "https://images.unsplash.com/photo-1509042239860-f550ce710b93",
+    "category_id": 8,
+    "price": 2500,
+    "amount": 500,
+    "is_discount": false
+  },
+  {
+    "id": 46,
+    "name": "Quyuqlashtirilgan sut",
+    "photo": "https://images.unsplash.com/photo-1584473457409-ae5c91d7d8b1",
+    "category_id": 9,
+    "price": 18000,
+    "amount": 100,
+    "is_discount": false
+  },
+  {
+    "id": 47,
+    "name": "Konservalangan makkajo'xori",
+    "photo": "https://images.unsplash.com/photo-1603046891744-1f76eb10aec1",
+    "category_id": 9,
+    "price": 14000,
+    "amount": 120,
+    "is_discount": false
+  },
+  {
+    "id": 48,
+    "name": "Tushonka",
+    "photo": "https://images.unsplash.com/photo-1584473457409-ae5c91d7d8b1",
+    "category_id": 9,
+    "price": 30000,
+    "amount": 80,
+    "is_discount": true
+  },
+  {
+    "id": 49,
+    "name": "No'xat konservasi",
+    "photo": "https://images.unsplash.com/photo-1603046891726-36bfd957e0bf",
+    "category_id": 9,
+    "price": 13000,
+    "amount": 100,
+    "is_discount": false
+  },
+  {
+    "id": 50,
+    "name": "Muzqaymoq",
+    "photo": "https://images.unsplash.com/photo-1563805042-7684c019e1cb",
+    "category_id": 10,
+    "price": 10000,
+    "amount": 200,
+    "is_discount": false
+  },
+  {
+    "id": 51,
+    "name": "Muzlatilgan chuchvara 1kg",
+    "photo": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d",
+    "category_id": 10,
+    "price": 38000,
+    "amount": 90,
+    "is_discount": false
+  },
+  {
+    "id": 52,
+    "name": "Muzlatilgan manti 1kg",
+    "photo": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d",
+    "category_id": 10,
+    "price": 42000,
+    "amount": 70,
+    "is_discount": true
+  },
+  {
+    "id": 53,
+    "name": "Ketchup",
+    "photo": "https://images.unsplash.com/photo-1604909052865-3a4d5f8c7076",
+    "category_id": 11,
+    "price": 15000,
+    "amount": 150,
+    "is_discount": false
+  },
+  {
+    "id": 54,
+    "name": "Mayonez",
+    "photo": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d",
+    "category_id": 11,
+    "price": 17000,
+    "amount": 140,
+    "is_discount": false
+  },
+  {
+    "id": 55,
+    "name": "Tuz 1kg",
+    "photo": "https://images.unsplash.com/photo-1518110925495-5fe2fda0442c",
+    "category_id": 11,
+    "price": 4000,
+    "amount": 500,
+    "is_discount": false
+  },
+  {
+    "id": 56,
+    "name": "Shakar 1kg",
+    "photo": "https://images.unsplash.com/photo-1581441363689-1f3c3c414635",
+    "category_id": 11,
+    "price": 12000,
+    "amount": 400,
+    "is_discount": true
+  },
+  {
+    "id": 57,
+    "name": "Kungaboqar yog'i 1L",
+    "photo": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5",
+    "category_id": 12,
+    "price": 18000,
+    "amount": 250,
+    "is_discount": false
+  },
+  {
+    "id": 58,
+    "name": "Zaytun moyi 500ml",
+    "photo": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5",
+    "category_id": 12,
+    "price": 55000,
+    "amount": 70,
+    "is_discount": false
+  },
+  {
+    "id": 59,
+    "name": "Sariyog' 200g",
+    "photo": "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d",
+    "category_id": 12,
+    "price": 22000,
+    "amount": 100,
+    "is_discount": true
+  },
+  {
+    "id": 60,
+    "name": "Kir yuvish kukuni 3kg",
+    "photo": "https://images.unsplash.com/photo-1585421514284-efb74c2b69ba",
+    "category_id": 13,
+    "price": 58000,
+    "amount": 80,
+    "is_discount": false
+  },
+  {
+    "id": 61,
+    "name": "Idish yuvish geli",
+    "photo": "https://images.unsplash.com/photo-1583947581924-860bda6a26df",
+    "category_id": 13,
+    "price": 18000,
+    "amount": 120,
+    "is_discount": false
+  },
+  {
+    "id": 62,
+    "name": "Sovun",
+    "photo": "https://images.unsplash.com/photo-1607006344380-b6775a0824ce",
+    "category_id": 14,
+    "price": 6000,
+    "amount": 300,
+    "is_discount": false
+  },
+  {
+    "id": 63,
+    "name": "Shampun",
+    "photo": "https://images.unsplash.com/photo-1556228578-8c89e6adf883",
+    "category_id": 14,
+    "price": 28000,
+    "amount": 100,
+    "is_discount": true
+  },
+  {
+    "id": 64,
+    "name": "Tish pastasi",
+    "photo": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be",
+    "category_id": 14,
+    "price": 17000,
+    "amount": 150,
+    "is_discount": false
+  },
+  {
+    "id": 65,
+    "name": "Bolalar tagligi",
+    "photo": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4",
+    "category_id": 15,
+    "price": 85000,
+    "amount": 60,
+    "is_discount": false
+  },
+  {
+    "id": 66,
+    "name": "Bolalar pyuresi",
+    "photo": "https://images.unsplash.com/photo-1609501676725-7186f7342a4b",
+    "category_id": 15,
+    "price": 14000,
+    "amount": 100,
+    "is_discount": false
+  }
 ]

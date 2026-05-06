@@ -1,12 +1,77 @@
 [
-   {
-      "id": 1,
-      "name": "Go'sh maxsulotlari",
-      "photo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu2OscgxRYn3SoqLTJqmDaZywRT7sPOU58gw&s"
-   },
-   {
-      "id": 2,
-      "name": "Ichimliklar",
-      "photo": "https://t4.ftcdn.net/jpg/02/79/69/21/360_F_279692163_4O1mMxIe4KdK3GZYl8gDY02zBFn65Gj0.jpg"
-   }
+  {
+    "id": 1,
+    "name": "Go'sht mahsulotlari",
+    "photo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu2OscgxRYn3SoqLTJqmDaZywRT7sPOU58gw&s"
+  },
+  {
+    "id": 2,
+    "name": "Ichimliklar",
+    "photo": "https://t4.ftcdn.net/jpg/02/79/69/21/360_F_279692163_4O1mMxIe4KdK3GZYl8gDY02zBFn65Gj0.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Sut mahsulotlari",
+    "photo": "https://images.unsplash.com/photo-1628088062854-d1870b4553da"
+  },
+  {
+    "id": 4,
+    "name": "Non va bakery mahsulotlari",
+    "photo": "https://images.unsplash.com/photo-1509440159596-0249088772ff"
+  },
+  {
+    "id": 5,
+    "name": "Meva va sabzavotlar",
+    "photo": "https://images.unsplash.com/photo-1610832958506-aa56368176cf"
+  },
+  {
+    "id": 6,
+    "name": "Shirinliklar",
+    "photo": "https://images.unsplash.com/photo-1488477181946-6428a0291777"
+  },
+  {
+    "id": 7,
+    "name": "Yormalar va makaron",
+    "photo": "https://images.unsplash.com/photo-1586201375761-83865001e31c"
+  },
+  {
+    "id": 8,
+    "name": "Choy va qahva",
+    "photo": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085"
+  },
+  {
+    "id": 9,
+    "name": "Konserva mahsulotlari",
+    "photo": "https://images.unsplash.com/photo-1584473457409-ae5c91d7d8b1"
+  },
+  {
+    "id": 10,
+    "name": "Muzlatilgan mahsulotlar",
+    "photo": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d"
+  },
+  {
+    "id": 11,
+    "name": "Souslar va ziravorlar",
+    "photo": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d"
+  },
+  {
+    "id": 12,
+    "name": "Yog' va moylar",
+    "photo": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5"
+  },
+  {
+    "id": 13,
+    "name": "Maishiy kimyo",
+    "photo": "https://images.unsplash.com/photo-1585421514284-efb74c2b69ba"
+  },
+  {
+    "id": 14,
+    "name": "Shaxsiy gigiyena",
+    "photo": "https://images.unsplash.com/photo-1556228578-8c89e6adf883"
+  },
+  {
+    "id": 15,
+    "name": "Bolalar mahsulotlari",
+    "photo": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4"
+  }
 ]
