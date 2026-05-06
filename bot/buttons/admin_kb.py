@@ -5,8 +5,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 def main_menu_admin_kb():
     kb = ReplyKeyboardBuilder()
     buttons = [
-        KeyboardButton(text="🛍Maxsulotlar"),
-        KeyboardButton(text="🗂️🏷️🗃️Kategoriyalar"),
+        KeyboardButton(text="🛍Maxsulotlar✏"),
     ]
     kb.add(*buttons)
     kb.adjust(1, 1)

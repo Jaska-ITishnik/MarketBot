@@ -32,7 +32,6 @@ class JsonDB:
     def _generate_id(self, data: list) -> int:
         if not data:
             return 1
-
         max_id = max(item.get("id", 0) for item in data)
         return max_id + 1
 
@@ -45,7 +44,6 @@ class JsonDB:
         for item in data:
             if item.get("id") == item_id:
                 return item
-
         return None
 
     def create(self, item: dict) -> dict:
