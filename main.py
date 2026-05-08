@@ -6,18 +6,23 @@ import asyncio
 import logging
 import sys
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, F
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message, BotCommand
+from aiogram.types import Message, BotCommand, CallbackQuery
 from dotenv import load_dotenv
 
 from bot.buttons import main_menu_user_kb, main_menu_admin_kb
-from bot.handlers import admin_message_router, admin_callback_router
+from bot.handlers import admin_message_router, admin_callback_router, inline_router
 from config import TOKEN, ADMINS
 
 load_dotenv(".env")
 dp = Dispatcher()
+
+
+@dp.callback_query(F.text == "check_if_subscribed")
+async def handle_check_if_subscribed(callback_query: CallbackQuery):
+    await callback_query.answer("Tekshirish bosildi ✅")
 
 
 @dp.message(Command(commands=['help']))
@@ -57,7 +62,7 @@ async def on_shutdown(bot: Bot):
 
 async def main() -> None:
     bot = Bot(token=TOKEN)  # noqa
-    dp.include_routers(admin_message_router, admin_callback_router)
+    dp.include_routers(admin_message_router, admin_callback_router, inline_router)
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
     await dp.start_polling(bot)

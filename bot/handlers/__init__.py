@@ -1,2 +1,3 @@
 from bot.handlers.admin_callback_handler import admin_callback_router
 from bot.handlers.admin_message_handler import admin_message_router
+from bot.handlers.inline_search_handler import inline_router
