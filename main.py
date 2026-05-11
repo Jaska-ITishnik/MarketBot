@@ -7,17 +7,23 @@ import logging
 import sys
 
 from aiogram import Bot, Dispatcher, F
-from aiogram.enums import ParseMode
+from aiogram.enums import ParseMode, ChatType
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, BotCommand, CallbackQuery
 from dotenv import load_dotenv
 
 from bot.buttons import main_menu_user_kb, main_menu_admin_kb
 from bot.handlers import admin_message_router, admin_callback_router, inline_router
+from bot.middlewares import JoinChannelGroupMiddleware
 from config import TOKEN, ADMINS
 
 load_dotenv(".env")
 dp = Dispatcher()
+
+
+@dp.message(F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP}))
+async def catch_channel_post(message: Message):
+    pass
 
 
 @dp.callback_query(F.text == "check_if_subscribed")
@@ -62,6 +68,7 @@ async def on_shutdown(bot: Bot):
 
 async def main() -> None:
     bot = Bot(token=TOKEN)  # noqa
+    dp.update.outer_middleware(JoinChannelGroupMiddleware())
     dp.include_routers(admin_message_router, admin_callback_router, inline_router)
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)

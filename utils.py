@@ -47,9 +47,6 @@
 #     )
 
 
-
-
-
 # Middle ware example
 
 from typing import Callable, Dict, Any, Awaitable, List
@@ -59,6 +56,8 @@ from aiogram.enums import ChatMemberStatus
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import TelegramObject, Message, CallbackQuery, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+from bot.handlers import start_function
 
 
 class JoinChannelMiddleware(BaseMiddleware):
@@ -102,5 +101,6 @@ class JoinChannelMiddleware(BaseMiddleware):
                 return
             else:
                 if event.callback_query:
-                    await event.callback_query.message.edit_text('Muvofaqiyatliy☺ qayta /start ni bosing')
+                    await event.callback_query.message.delete()
+                    await start_function(event.callback_query.message)
         return await handler(event, data)
