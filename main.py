@@ -9,6 +9,7 @@ import sys
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, BotCommand, CallbackQuery
+from aiogram.utils.i18n import I18n, FSMI18nMiddleware
 from dotenv import load_dotenv
 
 from bot.handlers import admin_message_router, admin_callback_router, inline_router, start_menu
@@ -52,7 +53,9 @@ async def on_shutdown(bot: Bot):
 
 async def main() -> None:
     bot = Bot(token=TOKEN)  # noqa
-    dp.update.outer_middleware(JoinChannelGroupMiddleware())
+    i18 = I18n(path='locales', default_locale='ru', domain="messages")
+    dp.update.outer_middleware.register(FSMI18nMiddleware(i18))
+    dp.update.outer_middleware.register(JoinChannelGroupMiddleware())
     dp.include_routers(admin_message_router, admin_callback_router, inline_router)
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
