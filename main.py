@@ -7,23 +7,16 @@ import logging
 import sys
 
 from aiogram import Bot, Dispatcher, F
-from aiogram.enums import ParseMode, ChatType
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, BotCommand, CallbackQuery
 from dotenv import load_dotenv
 
-from bot.buttons import main_menu_user_kb, main_menu_admin_kb
-from bot.handlers import admin_message_router, admin_callback_router, inline_router
+from bot.handlers import admin_message_router, admin_callback_router, inline_router, start_menu
 from bot.middlewares import JoinChannelGroupMiddleware
-from config import TOKEN, ADMINS
+from config import TOKEN
 
 load_dotenv(".env")
 dp = Dispatcher()
-
-
-@dp.message(F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP}))
-async def catch_channel_post(message: Message):
-    pass
 
 
 @dp.callback_query(F.text == "check_if_subscribed")
@@ -41,16 +34,7 @@ async def help_command_handler(message: Message):
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
-    if message.from_user.id not in ADMINS:
-        await message.answer("""
-    Assalomu aleykum dokonimizga xush kelibsiz😊
-    <blockquote>Buyurtma uchun👇</blockquote>
-        """, parse_mode=ParseMode.HTML, reply_markup=main_menu_user_kb())
-    else:
-        await message.answer("""
-            Assalomu aleykum <b>ADMIN</b> xush kelibsiz😊
-            <blockquote>Boshqarish uchun👇</blockquote>
-                """, parse_mode=ParseMode.HTML, reply_markup=main_menu_admin_kb())
+    await start_menu(message)
 
 
 async def on_startup(bot: Bot):
