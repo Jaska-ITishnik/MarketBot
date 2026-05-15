@@ -53,7 +53,7 @@ async def on_shutdown(bot: Bot):
 
 async def main() -> None:
     bot = Bot(token=TOKEN)  # noqa
-    i18 = I18n(path='locales', default_locale='ru', domain="messages")
+    i18 = I18n(path='locales', default_locale='uz', domain="messages")
     dp.update.outer_middleware.register(FSMI18nMiddleware(i18))
     dp.update.outer_middleware.register(JoinChannelGroupMiddleware())
     dp.include_routers(admin_message_router, admin_callback_router, inline_router)
