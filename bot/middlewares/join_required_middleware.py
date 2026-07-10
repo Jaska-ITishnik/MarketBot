@@ -6,7 +6,6 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.handlers import start_menu
 
 
 class JoinChannelGroupMiddleware(BaseMiddleware):
@@ -43,5 +42,5 @@ class JoinChannelGroupMiddleware(BaseMiddleware):
             else:
                 if event.callback_query:
                     await event.callback_query.message.delete()
-                    await start_menu(event.callback_query.message)
+                    # await start_menu(event.callback_query.message)
         return await handler(event, data)

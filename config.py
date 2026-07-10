@@ -3,5 +3,24 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv(".env")
-TOKEN = os.getenv("BOT_TOKEN")
-ADMINS = [int(admin) for admin in os.getenv("ADMINS").split()]
+
+
+class Settings:
+    def __init__(self, database, user, password, host, port):
+        self.database = database
+        self.user = user
+        self.password = password
+        self.host = host
+        self.port = port
+
+    def postgresql_url(self) -> str:
+        return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
+
+
+settings = Settings(
+    database=os.getenv("DB_NAME"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    host=os.getenv("DB_HOST"),
+    port=os.getenv("DB_PORT")
+)
