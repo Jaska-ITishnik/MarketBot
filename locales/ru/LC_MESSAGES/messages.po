@@ -30,6 +30,7 @@ msgstr ""
 "Здравствуйте, добро пожаловать в наш магазин?\n"
 "<blockquote>Для заказа?</blockquote>\n"
 " "
+
 #: bot/handlers/utils.py:19
 msgid ""
 "\n"
@@ -41,3 +42,4 @@ msgstr ""
 "Здравствуйте, <b>АДМИН</b>, добро пожаловать?\n"
 "<blockquote>Управлять?</blockquote>\n"
 " "
+

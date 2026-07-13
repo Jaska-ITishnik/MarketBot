@@ -10,3 +10,11 @@ compile:
 
 update:
 	pybabel update -d locales -D messages -i locales/messages.pot
+
+
+revision:
+	alembic revision --autogenerate -m "Create users table"
+upgrade:
+	alembic upgrade head
+downgrade:
+	alembic downgrade -1

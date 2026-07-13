@@ -28,6 +28,7 @@ class User(Model):
 class Category(Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    photo: Mapped[str] = mapped_column(String(100), nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     parent_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=True)
 
