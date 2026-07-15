@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from sqlalchemy import Integer, String, Date, DateTime, CheckConstraint, ForeignKey, Numeric, Text, Boolean
+from sqlalchemy import Integer, String, Date, DateTime, CheckConstraint, ForeignKey, Numeric, Text, Boolean, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Model
@@ -9,6 +9,7 @@ from db.base import Model
 
 class User(Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    telegram_id: Mapped[int] = mapped_column(Integer, nullable=True)
     first_name: Mapped[str] = mapped_column(String(30), nullable=False)
     last_name: Mapped[str] = mapped_column(String(30), nullable=False)
     gender: Mapped[str] = mapped_column(String(15), nullable=False)
@@ -41,6 +42,7 @@ class Product(Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=False)
     name: Mapped[str] = mapped_column(String(150), nullable=False)
+    photo: Mapped[str] = mapped_column(String(150), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     price: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     stock_quantity: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
@@ -48,6 +50,7 @@ class Product(Model):
 
     category: Mapped["Category"] = relationship("Category", back_populates="products")
     order_items: Mapped[list["OrderItem"]] = relationship("OrderItem", back_populates="product")
+    basket_items: Mapped[list["Basket"]] = relationship("Basket", back_populates="product")
 
     __table_args__ = (
         CheckConstraint(
@@ -57,6 +60,29 @@ class Product(Model):
         CheckConstraint(
             "stock_quantity >= 0",
             name='product_stock_quantity_check'
+        ),
+    )
+
+
+class Basket(Model):
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    telegram_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey("products.id"), nullable=False)
+    quantity: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    product: Mapped["Product"] = relationship("Product", back_populates="basket_items")
+
+    __table_args__ = (
+        UniqueConstraint(
+            "telegram_id",
+            "product_id",
+            name="basket_telegram_product_unique",
+        ),
+        CheckConstraint(
+            "quantity > 0",
+            name="basket_quantity_check"
         ),
     )
 
