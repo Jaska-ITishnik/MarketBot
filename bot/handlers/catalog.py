@@ -1,25 +1,58 @@
 from collections import defaultdict
 from decimal import Decimal
 from html import escape
+import logging
 from math import ceil
 from pathlib import Path
 
 from aiogram import F, Router
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.filters import Command
-from aiogram.types import CallbackQuery, FSInputFile, InlineKeyboardButton, InlineKeyboardMarkup, Message
-from sqlalchemy import select
+from aiogram.filters import Command, StateFilter
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import (
+    CallbackQuery,
+    FSInputFile,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    InlineQuery,
+    InlineQueryResultArticle,
+    InlineQueryResultPhoto,
+    InputTextMessageContent,
+    Message,
+    ReplyKeyboardRemove,
+)
+from sqlalchemy import and_, or_, select
 
 from bot.buttons import MainMenu, main_menu_keyboard
+from config import settings
 from db import database
 from db.models import Basket, Category, Product
+from db.product_photos import product_photo_public_path, product_photo_source
 
 router = Router(name="catalog")
+logger = logging.getLogger(__name__)
 
 CATEGORY_PAGE_SIZE = 8
 PRODUCT_PAGE_SIZE = 7
+SEARCH_RESULT_LIMIT = 8
+INLINE_RESULT_LIMIT = 20
 MAX_PRODUCT_BUTTON_TEXT_LENGTH = 52
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+SEARCH_CANCEL_TEXT = "❌ Bekor qilish"
+MAIN_MENU_TEXTS = {
+    MainMenu.CATALOG,
+    MainMenu.CART,
+    MainMenu.ORDERS,
+    MainMenu.SEARCH,
+    MainMenu.PROFILE,
+    MainMenu.CONTACT,
+    MainMenu.SETTINGS,
+}
+
+
+class ProductSearch(StatesGroup):
+    waiting_query = State()
 
 
 def _format_money(value: Decimal) -> str:
@@ -80,6 +113,47 @@ def _fetch_products_for_category(category_id: int) -> list[Product]:
     return list(database.execute(query).scalars().all())
 
 
+def _search_products(search_text: str, limit: int = SEARCH_RESULT_LIMIT) -> list[Product]:
+    terms = [term for term in search_text.strip().split() if term]
+    if not terms:
+        return []
+
+    fields = (
+        Product.name,
+        Product.description,
+        Category.name,
+        Category.description,
+    )
+    phrase_pattern = f"%{search_text.strip()}%"
+    phrase_condition = or_(*(field.ilike(phrase_pattern) for field in fields))
+    term_conditions = [
+        or_(*(field.ilike(f"%{term}%") for field in fields))
+        for term in terms
+    ]
+
+    query = (
+        select(Product)
+        .join(Category)
+        .where(
+            Product.is_active.is_(True),
+            or_(phrase_condition, and_(*term_conditions)),
+        )
+        .order_by(Product.name)
+        .limit(limit)
+    )
+    return list(database.execute(query).scalars().all())
+
+
+def _fetch_inline_suggestions(limit: int = INLINE_RESULT_LIMIT) -> list[Product]:
+    query = (
+        select(Product)
+        .where(Product.is_active.is_(True))
+        .order_by(Product.stock_quantity.desc(), Product.name)
+        .limit(limit)
+    )
+    return list(database.execute(query).scalars().all())
+
+
 def _categories_keyboard(categories: list[Category], page: int) -> InlineKeyboardMarkup:
     page, total_pages = _page_bounds(len(categories), CATEGORY_PAGE_SIZE, page)
     start = page * CATEGORY_PAGE_SIZE
@@ -88,7 +162,7 @@ def _categories_keyboard(categories: list[Category], page: int) -> InlineKeyboar
     rows = [
         [
             InlineKeyboardButton(
-                text=category.name,
+                text=f"🏷 {category.name}",
                 callback_data=f"pl:{category.id}:0",
             )
         ]
@@ -98,10 +172,10 @@ def _categories_keyboard(categories: list[Category], page: int) -> InlineKeyboar
     if total_pages > 1:
         nav_row = []
         if page > 0:
-            nav_row.append(InlineKeyboardButton(text="Oldingi", callback_data=f"cp:{page - 1}"))
+            nav_row.append(InlineKeyboardButton(text="⬅️ Oldingi", callback_data=f"cp:{page - 1}"))
         nav_row.append(InlineKeyboardButton(text=f"{page + 1}/{total_pages}", callback_data="noop"))
         if page < total_pages - 1:
-            nav_row.append(InlineKeyboardButton(text="Keyingi", callback_data=f"cp:{page + 1}"))
+            nav_row.append(InlineKeyboardButton(text="Keyingi ➡️", callback_data=f"cp:{page + 1}"))
         rows.append(nav_row)
 
     return InlineKeyboardMarkup(inline_keyboard=rows)
@@ -119,7 +193,7 @@ def _products_keyboard(
     rows = [
         [
             InlineKeyboardButton(
-                text=_short_text(product.name),
+                text=f"📦 {_short_text(product.name)}",
                 callback_data=f"pd:{product.id}:{category_id}:{page}",
             )
         ]
@@ -129,13 +203,13 @@ def _products_keyboard(
     if total_pages > 1:
         nav_row = []
         if page > 0:
-            nav_row.append(InlineKeyboardButton(text="Oldingi", callback_data=f"pl:{category_id}:{page - 1}"))
+            nav_row.append(InlineKeyboardButton(text="⬅️ Oldingi", callback_data=f"pl:{category_id}:{page - 1}"))
         nav_row.append(InlineKeyboardButton(text=f"{page + 1}/{total_pages}", callback_data="noop"))
         if page < total_pages - 1:
-            nav_row.append(InlineKeyboardButton(text="Keyingi", callback_data=f"pl:{category_id}:{page + 1}"))
+            nav_row.append(InlineKeyboardButton(text="Keyingi ➡️", callback_data=f"pl:{category_id}:{page + 1}"))
         rows.append(nav_row)
 
-    rows.append([InlineKeyboardButton(text="Kategoriyalarga qaytish", callback_data="cp:0")])
+    rows.append([InlineKeyboardButton(text="⬅️ Kategoriyalarga qaytish", callback_data="cp:0")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
@@ -159,15 +233,30 @@ def _product_detail_keyboard(
         rows.append(
             [
                 InlineKeyboardButton(
-                    text="Savatga qo'shish",
+                    text="🛒 Savatga qo'shish",
                     callback_data=f"add:{product.id}:{quantity}",
                 )
             ]
         )
     else:
-        rows.append([InlineKeyboardButton(text="Omborda yo'q", callback_data="noop")])
+        rows.append([InlineKeyboardButton(text="📭 Omborda yo'q", callback_data="noop")])
 
-    rows.append([InlineKeyboardButton(text="Mahsulotlarga qaytish", callback_data=f"pl:{category_id}:{page}")])
+    rows.append([InlineKeyboardButton(text="⬅️ Mahsulotlarga qaytish", callback_data=f"pl:{category_id}:{page}")])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def _inline_product_keyboard(product: Product) -> InlineKeyboardMarkup:
+    if product.stock_quantity <= 0:
+        rows = [[InlineKeyboardButton(text="📭 Omborda yo'q", callback_data="noop")]]
+    else:
+        rows = [
+            [
+                InlineKeyboardButton(
+                    text="🛒 Savatga qo'shish",
+                    callback_data=f"add:{product.id}:1",
+                )
+            ]
+        ]
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
@@ -176,17 +265,17 @@ def _product_detail_text(product: Product) -> str:
     category_name = product.category.name if product.category else "Kategoriyasiz"
 
     return (
-        f"<b>{escape(product.name)}</b>\n\n"
-        f"<b>Narx:</b> {_format_money(product.price)} so'm\n"
-        f"<b>Omborda:</b> {product.stock_quantity} dona\n"
-        f"<b>Kategoriya:</b> {escape(category_name)}\n\n"
-        f"<b>Mahsulot haqida</b>\n"
+        f"📦 <b>{escape(product.name)}</b>\n\n"
+        f"💰 <b>Narx:</b> {_format_money(product.price)} so'm\n"
+        f"📦 <b>Omborda:</b> {product.stock_quantity} dona\n"
+        f"🏷 <b>Kategoriya:</b> {escape(category_name)}\n\n"
+        f"ℹ️ <b>Mahsulot haqida</b>\n"
         f"{escape(description)}"
     )
 
 
 def _product_photo(product: Product) -> str | FSInputFile | None:
-    photo = (product.photo or "").strip()
+    photo = product_photo_source(product.photo)
     if not photo:
         return None
 
@@ -201,6 +290,74 @@ def _product_photo(product: Product) -> str | FSInputFile | None:
         return None
 
     return FSInputFile(photo_path)
+
+
+def _product_photo_url(product: Product) -> str | None:
+    photo = product_photo_public_path(product.photo)
+    if not photo:
+        return None
+
+    if photo.startswith(("http://", "https://")):
+        return photo
+
+    if not settings.public_base_url:
+        return None
+
+    return f"{settings.public_base_url}/{photo.lstrip('/')}"
+
+
+def _inline_result_description(product: Product) -> str:
+    category_name = product.category.name if product.category else "Kategoriyasiz"
+    return (
+        f"{category_name} | {_format_money(product.price)} so'm | "
+        f"Omborda: {product.stock_quantity} dona"
+    )
+
+
+def _inline_product_result(product: Product) -> InlineQueryResultArticle | InlineQueryResultPhoto:
+    photo_url = _product_photo_url(product)
+    reply_markup = _inline_product_keyboard(product)
+    text = _product_detail_text(product)
+    description = _inline_result_description(product)
+
+    if photo_url:
+        return InlineQueryResultPhoto(
+            id=f"product-photo-{product.id}",
+            photo_url=photo_url,
+            thumbnail_url=photo_url,
+            title=product.name,
+            description=description,
+            caption=text,
+            parse_mode="HTML",
+            reply_markup=reply_markup,
+        )
+
+    return InlineQueryResultArticle(
+        id=f"product-article-{product.id}",
+        title=product.name,
+        description=description,
+        input_message_content=InputTextMessageContent(
+            message_text=text,
+            parse_mode="HTML",
+        ),
+        reply_markup=reply_markup,
+    )
+
+
+def _empty_inline_result(query: str) -> InlineQueryResultArticle:
+    message = (
+        f"🔎 <b>{escape(query)}</b> bo'yicha mahsulot topilmadi.\n\n"
+        "Boshqa kalit so'z bilan qayta urinib ko'ring."
+    )
+    return InlineQueryResultArticle(
+        id="no-results",
+        title="Mahsulot topilmadi",
+        description="Boshqa mahsulot nomi, kategoriya yoki kalit so'z yozing.",
+        input_message_content=InputTextMessageContent(
+            message_text=message,
+            parse_mode="HTML",
+        ),
+    )
 
 
 def _callback_chat_id(callback_query: CallbackQuery) -> int:
@@ -272,17 +429,36 @@ def _upsert_basket_item(telegram_id: int, product: Product, quantity: int) -> in
     return basket_item.quantity
 
 
+def _inline_search_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="🔎 Inline qidirishni ochish",
+                    switch_inline_query_current_chat="",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=SEARCH_CANCEL_TEXT,
+                    callback_data="search:cancel",
+                )
+            ],
+        ]
+    )
+
+
 async def _send_categories(message: Message, page: int = 0) -> None:
     categories = _fetch_categories()
     if not categories:
         await message.answer(
-            "Kategoriyalar hozircha mavjud emas.",
+            "🏷 Kategoriyalar hozircha mavjud emas.",
             reply_markup=main_menu_keyboard(),
         )
         return
 
     await message.answer(
-        "Kategoriyani tanlang:",
+        "🛍 Kategoriyani tanlang:",
         reply_markup=_categories_keyboard(categories, page),
     )
 
@@ -290,13 +466,13 @@ async def _send_categories(message: Message, page: int = 0) -> None:
 async def _edit_categories(callback_query: CallbackQuery, page: int = 0) -> None:
     categories = _fetch_categories()
     if not categories:
-        await _replace_callback_message(callback_query, "Kategoriyalar hozircha mavjud emas.")
+        await _replace_callback_message(callback_query, "🏷 Kategoriyalar hozircha mavjud emas.")
         await callback_query.answer()
         return
 
     await _replace_callback_message(
         callback_query,
-        "Kategoriyani tanlang:",
+        "🛍 Kategoriyani tanlang:",
         reply_markup=_categories_keyboard(categories, page),
     )
     await callback_query.answer()
@@ -312,10 +488,10 @@ async def _edit_products(callback_query: CallbackQuery, category_id: int, page: 
     if not products:
         await _replace_callback_message(
             callback_query,
-            f"<b>{escape(category.name)}</b>\n\nBu kategoriyada hozircha mahsulot yo'q.",
+            f"🏷 <b>{escape(category.name)}</b>\n\n📭 Bu kategoriyada hozircha mahsulot yo'q.",
             reply_markup=InlineKeyboardMarkup(
                 inline_keyboard=[
-                    [InlineKeyboardButton(text="Kategoriyalarga qaytish", callback_data="cp:0")]
+                    [InlineKeyboardButton(text="⬅️ Kategoriyalarga qaytish", callback_data="cp:0")]
                 ]
             ),
             parse_mode="HTML",
@@ -326,10 +502,10 @@ async def _edit_products(callback_query: CallbackQuery, category_id: int, page: 
     page, total_pages = _page_bounds(len(products), PRODUCT_PAGE_SIZE, page)
     await _replace_callback_message(
         callback_query,
-        f"<b>{escape(category.name)}</b>\n"
-        f"Mahsulotlar: {len(products)} ta\n"
-        f"Sahifa: {page + 1}/{total_pages}\n\n"
-        "Mahsulotni tanlang:",
+        f"🏷 <b>{escape(category.name)}</b>\n"
+        f"📦 Mahsulotlar: {len(products)} ta\n"
+        f"📄 Sahifa: {page + 1}/{total_pages}\n\n"
+        "👇 Mahsulotni tanlang:",
         reply_markup=_products_keyboard(products, category_id, page),
         parse_mode="HTML",
     )
@@ -386,19 +562,134 @@ async def _edit_product_detail(
     await callback_query.answer()
 
 
+@router.inline_query()
+async def inline_product_search_handler(inline_query: InlineQuery) -> None:
+    query = inline_query.query.strip()
+    if query:
+        products = _search_products(query, limit=INLINE_RESULT_LIMIT)
+    else:
+        products = _fetch_inline_suggestions()
+
+    results = [_inline_product_result(product) for product in products]
+    if query and not results:
+        results = [_empty_inline_result(query)]
+
+    await inline_query.answer(
+        results=results,
+        cache_time=1,
+        is_personal=True,
+    )
+
+
 @router.message(Command(commands=["catalog"]))
 @router.message(F.text == MainMenu.CATALOG)
 async def catalog_handler(message: Message) -> None:
     await _send_categories(message)
 
 
+@router.message(Command(commands=["search"]))
 @router.message(F.text == MainMenu.SEARCH)
-async def search_handler(message: Message) -> None:
+async def search_handler(message: Message, state: FSMContext) -> None:
+    await state.clear()
+    await state.set_state(ProductSearch.waiting_query)
     await message.answer(
-        "Qidirish bo'limi.\n\n"
-        "Keyingi bosqichda mahsulot nomi bo'yicha qidiruv qo'shamiz.",
+        "🔎 Qidirish rejimi yoqildi.",
+        reply_markup=ReplyKeyboardRemove(),
+    )
+    await message.answer(
+        "🔎 <b>Qidirish</b>\n\n"
+        "Inline qidiruv uchun tugmani bosing yoki shu yerga mahsulot nomi, "
+        "kategoriya yoki kalit so'z yozing.\n"
+        "Masalan: <i>iphone</i>, <i>noutbuk</i>, <i>audio</i>, <i>samsung</i>.",
+        reply_markup=_inline_search_keyboard(),
+        parse_mode="HTML",
+    )
+
+
+@router.callback_query(F.data == "search:cancel")
+async def search_cancel_callback_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await state.clear()
+    if callback_query.message is not None:
+        await callback_query.message.edit_text("❌ Qidirish bekor qilindi.")
+        await callback_query.message.answer(
+            "👇 Asosiy menyu:",
+            reply_markup=main_menu_keyboard(),
+        )
+    await callback_query.answer()
+
+
+@router.message(StateFilter(ProductSearch.waiting_query), F.text == SEARCH_CANCEL_TEXT)
+async def search_cancel_handler(message: Message, state: FSMContext) -> None:
+    await state.clear()
+    await message.answer(
+        "❌ Qidirish bekor qilindi.",
         reply_markup=main_menu_keyboard(),
     )
+
+
+@router.message(StateFilter(ProductSearch.waiting_query), F.text.in_(MAIN_MENU_TEXTS))
+async def search_menu_button_handler(message: Message, state: FSMContext) -> None:
+    await state.clear()
+    await message.answer(
+        "🔎 Qidirish rejimi yopildi. Kerakli bo'limni menyudan qayta tanlang.",
+        reply_markup=main_menu_keyboard(),
+    )
+
+
+@router.message(ProductSearch.waiting_query)
+async def search_query_handler(message: Message, state: FSMContext) -> None:
+    query = (message.text or "").strip()
+    if len(query) < 2:
+        await message.answer("🔎 Kamida 2 ta belgi kiriting.")
+        return
+
+    products = _search_products(query)
+    if not products:
+        await message.answer(
+            f"🔎 <b>{escape(query)}</b> bo'yicha mahsulot topilmadi.\n\n"
+            "Boshqa kalit so'z bilan qayta urinib ko'ring.",
+            parse_mode="HTML",
+        )
+        return
+
+    await state.clear()
+    await message.answer(
+        f"🔎 <b>{escape(query)}</b> bo'yicha {len(products)} ta mahsulot topildi:",
+        reply_markup=main_menu_keyboard(),
+        parse_mode="HTML",
+    )
+
+    for product in products:
+        reply_markup = _product_detail_keyboard(
+            product=product,
+            category_id=product.category_id,
+            page=0,
+            quantity=1,
+        )
+        text = _product_detail_text(product)
+        photo = _product_photo(product)
+
+        if photo is None:
+            await message.answer(
+                text,
+                reply_markup=reply_markup,
+                parse_mode="HTML",
+            )
+            continue
+
+        try:
+            await message.answer_photo(
+                photo=photo,
+                caption=text,
+                reply_markup=reply_markup,
+                parse_mode="HTML",
+            )
+        except TelegramBadRequest:
+            await message.answer(
+                text,
+                reply_markup=reply_markup,
+                parse_mode="HTML",
+            )
 
 
 @router.callback_query(F.data == "noop")
@@ -458,22 +749,45 @@ async def add_to_basket_handler(callback_query: CallbackQuery) -> None:
         await callback_query.answer("Foydalanuvchi aniqlanmadi.", show_alert=True)
         return
 
-    _, product_id, quantity = callback_query.data.split(":")
-    product = _fetch_product(int(product_id))
+    try:
+        _, product_id, quantity = callback_query.data.split(":")
+        product_id = int(product_id)
+        quantity = int(quantity)
+    except (TypeError, ValueError):
+        await callback_query.answer("Savatga qo'shish so'rovi noto'g'ri.", show_alert=True)
+        return
+
+    product = _fetch_product(product_id)
     if product is None:
         await callback_query.answer("Mahsulot topilmadi.", show_alert=True)
         return
 
-    saved_quantity = _upsert_basket_item(
-        telegram_id=callback_query.from_user.id,
-        product=product,
-        quantity=int(quantity),
-    )
+    try:
+        saved_quantity = _upsert_basket_item(
+            telegram_id=callback_query.from_user.id,
+            product=product,
+            quantity=quantity,
+        )
+    except Exception:
+        logger.exception(
+            "Could not add product %s to basket for telegram_id %s",
+            product.id,
+            callback_query.from_user.id,
+        )
+        await callback_query.answer("Mahsulot savatga qo'shilmadi. Qayta urinib ko'ring.", show_alert=True)
+        return
+
     if saved_quantity == 0:
         await callback_query.answer("Bu mahsulot hozir omborda yo'q.", show_alert=True)
         return
 
     await callback_query.answer(
-        f"Savatga qo'shildi. Savatda: {saved_quantity} dona.",
-        show_alert=False,
+        f"🛒 Savatga qo'shildi.\nSavatda: {saved_quantity} dona.",
+        show_alert=True,
     )
+    if callback_query.message is not None and callback_query.message.chat.id == callback_query.from_user.id:
+        await callback_query.message.answer(
+            f"✅ {escape(product.name)} savatga qo'shildi.\n"
+            f"🛒 Savatdagi miqdor: {saved_quantity} dona.",
+            reply_markup=main_menu_keyboard(),
+        )

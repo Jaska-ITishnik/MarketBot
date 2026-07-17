@@ -31,5 +31,5 @@ def main_menu_keyboard() -> ReplyKeyboardMarkup:
             ],
         ],
         resize_keyboard=True,
-        input_field_placeholder="Kerakli bo'limni tanlang",
+        input_field_placeholder="👇 Kerakli bo'limni tanlang",
     )

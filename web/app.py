@@ -1,11 +1,8 @@
-import os
-
 import uvicorn
-from libcloud.storage.drivers.local import LocalStorageDriver
-from sqlalchemy_file.storage import StorageManager
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.staticfiles import StaticFiles
 from starlette_admin import I18nConfig
 from starlette_admin.contrib.sqla import Admin
 from starlette_admin.contrib.sqla import ModelView
@@ -13,13 +10,18 @@ from starlette_admin.contrib.sqla import ModelView
 from config import settings
 from db import User, Category, Product, Order, Payment
 from db.base import db
+from db.storage import MEDIA_DIR, PROJECT_ROOT, configure_file_storage
 from web.provider import UsernameAndPasswordProvider
+
+configure_file_storage()
 
 middleware = [
     Middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 ]
 
 app = Starlette(middleware=middleware)
+app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
+app.mount("/images", StaticFiles(directory=PROJECT_ROOT / "images"), name="images")
 
 i18n_config = I18nConfig(
     default_locale="uz"
@@ -54,14 +56,25 @@ class CategoryModelView(ModelView):
 
 class ProductModelView(ModelView):
     label = "🧈Maxsulotlar"
-    exclude_fields_from_create = 'created_at', 'updated_at'
-    exclude_fields_from_edit = 'created_at', 'updated_at'
+    fields = (
+        "id",
+        "category",
+        "name",
+        "photo",
+        "description",
+        "price",
+        "stock_quantity",
+        "is_active",
+    )
+    exclude_fields_from_create = 'id',
+    exclude_fields_from_edit = 'id',
 
 
 class OrderModelView(ModelView):
     label = "Buyurtmalar"
-    exclude_fields_from_create = 'created_at', 'updated_at'
-    exclude_fields_from_edit = 'created_at', 'updated_at'
+    fields = "id", "status", "user", "total_amount"
+    exclude_fields_from_create = 'created_at',
+    exclude_fields_from_edit = 'created_at',
 
 
 class PaymentModelView(ModelView):
@@ -78,11 +91,6 @@ admin.add_view(PaymentModelView(Payment))
 
 # Mount admin to your app
 admin.mount_to(app)
-
-# Configure Storage
-os.makedirs("./media/attachment", 0o777, exist_ok=True)
-container = LocalStorageDriver("./media").get_container("attachment")
-StorageManager.add_storage("default", container)
 
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=8088)

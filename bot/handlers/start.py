@@ -9,8 +9,8 @@ router = Router(name="start")
 
 async def show_main_menu(message: Message) -> None:
     await message.answer(
-        "Assalomu alaykum! Online do'kon botiga xush kelibsiz.\n\n"
-        "Quyidagi menyulardan birini tanlang:",
+        "👋 Assalomu alaykum! Online do'kon botiga xush kelibsiz.\n\n"
+        "👇 Quyidagi menyulardan birini tanlang:",
         reply_markup=main_menu_keyboard(),
     )
 

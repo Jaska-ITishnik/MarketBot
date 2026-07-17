@@ -9,7 +9,8 @@ router = Router(name="profile")
 @router.message(F.text == MainMenu.PROFILE)
 async def profile_handler(message: Message) -> None:
     await message.answer(
-        "Profil bo'limi.\n\n"
-        "Bu yerda telefon raqam, manzil va shaxsiy ma'lumotlar saqlanadi.",
+        "👤 <b>Profil</b>\n\n"
+        "📞 Telefon raqam, 📍 manzil va shaxsiy ma'lumotlar shu bo'limda saqlanadi.",
         reply_markup=main_menu_keyboard(),
+        parse_mode="HTML",
     )

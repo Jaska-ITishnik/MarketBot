@@ -1,15 +1,16 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from sqlalchemy import Integer, String, Date, DateTime, CheckConstraint, ForeignKey, Numeric, Text, Boolean, UniqueConstraint
+from sqlalchemy import BigInteger, Integer, String, Date, DateTime, CheckConstraint, ForeignKey, Numeric, Text, Boolean, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy_file import File, ImageField
 
 from db.base import Model
 
 
 class User(Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    telegram_id: Mapped[int] = mapped_column(Integer, nullable=True)
+    telegram_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
     first_name: Mapped[str] = mapped_column(String(30), nullable=False)
     last_name: Mapped[str] = mapped_column(String(30), nullable=False)
     gender: Mapped[str] = mapped_column(String(15), nullable=False)
@@ -42,7 +43,7 @@ class Product(Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=False)
     name: Mapped[str] = mapped_column(String(150), nullable=False)
-    photo: Mapped[str] = mapped_column(String(150), nullable=False)
+    photo: Mapped[File] = mapped_column(ImageField(upload_storage="default", thumbnail_size=(128, 128)))
     description: Mapped[str] = mapped_column(Text, nullable=True)
     price: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     stock_quantity: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
@@ -66,7 +67,7 @@ class Product(Model):
 
 class Basket(Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    telegram_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    telegram_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     product_id: Mapped[int] = mapped_column(Integer, ForeignKey("products.id"), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)

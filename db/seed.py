@@ -5,6 +5,8 @@ from sqlalchemy import select
 
 from db import database
 from db.models import Category, Product
+from db.product_photos import product_photo_file
+from db.storage import configure_file_storage
 
 
 CATEGORIES = [
@@ -485,6 +487,7 @@ def _product_photo_path(name: str) -> str:
 
 
 def seed() -> tuple[int, int, int, int]:
+    configure_file_storage()
     database.create_all()
 
     created_categories = 0
@@ -525,7 +528,9 @@ def seed() -> tuple[int, int, int, int]:
                 updated_products += 1
 
             product.category = category
-            product.photo = product_data.get("photo", _product_photo_path(product_data["name"]))
+            product.photo = product_photo_file(
+                product_data.get("photo", _product_photo_path(product_data["name"]))
+            )
             product.description = product_data["description"]
             product.price = Decimal(product_data["price"])
             product.stock_quantity = product_data["stock_quantity"]
